@@ -33,3 +33,4 @@ class products(models.Model):
 class productImage(models.Model):
     products = models.ForeignKey(products, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/')
+
