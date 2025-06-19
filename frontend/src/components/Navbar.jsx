@@ -3,41 +3,58 @@ import { assets } from "../assets/assets";
 import { Link, NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-const Navbar = ({ setShowSearch,}) => {
+const Navbar = ({ setShowSearch }) => {
   const [visible, setVisible] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const navigate = useNavigate();
 
-  // Function to calculate total items from localStorage
-  const calculateCartCount = () => {
-    const cart = JSON.parse(localStorage.getItem("cart")) || {};
-    let count = 0;
-  
-    for (const productId in cart) {
-      // Skip if productId is not a number
-      if (isNaN(Number(productId))) continue;
-  
-      for (const size in cart[productId]) {
-        count += cart[productId][size];
-      }
-    }
-  
-    setCartCount(count);
-  };
-
   useEffect(() => {
-    calculateCartCount(); // Initial load
-  
-    const handleCartUpdate = () => {
-      calculateCartCount();
+    const calculateCartCount = () => {
+      const cart = JSON.parse(localStorage.getItem("cart")) || {};
+      let count = 0;
+      for (const productId in cart) {
+        for (const size in cart[productId]) {
+          count += cart[productId][size];
+        }
+      }
+      setCartCount(count);
     };
-  
+
+    calculateCartCount();
+
+    const handleCartUpdate = () => calculateCartCount();
+    const handleStorageChange = (e) => {
+      if (e.key === "cart") calculateCartCount();
+    };
+
     window.addEventListener("cart-updated", handleCartUpdate);
-  
+    window.addEventListener("storage", handleStorageChange);
+
+    // 👇 NEW: Listen for login cart restoration
+    window.addEventListener("cart-restored", handleCartUpdate);
+
     return () => {
       window.removeEventListener("cart-updated", handleCartUpdate);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("cart-restored", handleCartUpdate);
     };
   }, []);
+
+  const handleLogout = () => {
+    const email = (localStorage.getItem("email") || "").toLowerCase().trim();
+    const currentCart = localStorage.getItem("cart");
+
+    if (email && currentCart) {
+      localStorage.setItem(`cart_${email}`, currentCart); // save cart to user-specific key
+    }
+
+    localStorage.removeItem("cart"); // ✅ Remove current session cart
+    localStorage.removeItem("email"); // clear everything (including cart and email)
+
+    window.dispatchEvent(new Event("cart-updated"));
+    // console.log("Saving cart before logout:", email, currentCart);
+    navigate("/");
+  };
 
 
   return (
@@ -82,9 +99,24 @@ const Navbar = ({ setShowSearch,}) => {
           </Link>
           <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
             <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
-              <p className="cursor-pointer hover:text-black" onClick={() => navigate("/profile")}>My Profile</p>
-              <p className="cursor-pointer hover:text-black" onClick={() => navigate("/orders")}>Orders</p>
-              <p className="cursor-pointer hover:text-black" onClick={() => navigate("/")}>Log-out</p>
+              <p
+                className="cursor-pointer hover:text-black"
+                onClick={() => navigate("/profile")}
+              >
+                My Profile
+              </p>
+              <p
+                className="cursor-pointer hover:text-black"
+                onClick={() => navigate("/orders")}
+              >
+                Orders
+              </p>
+              <p
+                className="cursor-pointer hover:text-black"
+                onClick={handleLogout}
+              >
+                Log-out
+              </p>
             </div>
           </div>
         </div>
@@ -151,3 +183,18 @@ const Navbar = ({ setShowSearch,}) => {
 };
 
 export default Navbar;
+
+// const calculateCartCount = () => {
+//   const cart = JSON.parse(localStorage.getItem("cart")) || {};
+//   let count = 0;
+
+//   for (const productId in cart) {
+//     if (isNaN(Number(productId))) continue;
+
+//     for (const size in cart[productId]) {
+//       count += cart[productId][size];
+//     }
+//   }
+
+//   setCartCount(count);
+// };

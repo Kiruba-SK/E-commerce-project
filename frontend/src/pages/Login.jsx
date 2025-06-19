@@ -32,17 +32,28 @@ const Login = () => {
       });
 
       const data = await response.json();
-      console.log(data);
 
-      if (response.ok  && data.success) {
+      if (response.ok && data.success) {
         toast.success(data.message || "Success!");
-        localStorage.setItem("email", email);
-        navigate("/home");
+        const normalizedEmail = email.toLowerCase().trim();
+        localStorage.setItem("email", normalizedEmail);
 
+        if (currentState === "Login") {
+          const storedCart = localStorage.getItem(`cart_${normalizedEmail}`);
+
+          if (storedCart) {
+            localStorage.setItem("cart", storedCart);
+          } else {
+            localStorage.removeItem("cart");
+          }
+
+          window.dispatchEvent(new Event("cart-restored"));
+        }
+
+        navigate("/home");
       } else {
-        toast.error(data.error || data.message || "Failed.");
+        toast.info(data.error || data.message || "Failed.");
       }
-      
     } catch (err) {
       console.error("API Error:", err);
       toast.error("Something went wrong");

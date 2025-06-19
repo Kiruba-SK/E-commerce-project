@@ -94,8 +94,15 @@ def update_user_profile(request):
         user.phone = request.data.get('phone', user.phone)
         user.dob = request.data.get('dob', user.dob)
         user.gender = request.data.get('gender', user.gender)
+        
+        # Handle removal before upload
+        if request.data.get('remove_profile_picture') == 'true':
+            if user.profile_picture:
+                user.profile_picture.delete(save=False)
+                user.profile_picture = None
 
-        if 'profile_picture' in request.FILES:
+        # Handle profile picture upload (if not removed)
+        elif 'profile_picture' in request.FILES:
             user.profile_picture = request.FILES['profile_picture']
 
         user.save()

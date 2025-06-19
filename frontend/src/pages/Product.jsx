@@ -25,6 +25,7 @@ const Product = () => {
             sizes: JSON.parse(data.product.sizes),
           });
           setImage(data.product.images[0]?.image || "");
+          window.scrollTo({ top: 0, behavior: "smooth" });
         } else {
           console.error("Product not found:", data);
         }
@@ -38,11 +39,9 @@ const Product = () => {
 
   const handleAddToCart = () => {
     if (!size) {
-      toast.error("Please select a size before adding to cart.");      return;
+      toast.error("Please select a size before adding to cart.");
+      return;
     }
-
-    // console.log("productData:", productData);
-    // console.log("Adding to cart:", productData.id, size);
 
     const cart = JSON.parse(localStorage.getItem("cart")) || {};
 
@@ -57,6 +56,11 @@ const Product = () => {
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
+
+    const email = localStorage.getItem("email");
+    if (email) {
+      localStorage.setItem(`cart_${email}`, JSON.stringify(cart));
+    }
 
     // Dispatch event to notify Navbar
     window.dispatchEvent(new Event("cart-updated"));
@@ -154,5 +158,3 @@ const Product = () => {
 };
 
 export default Product;
-
-

@@ -49,7 +49,22 @@ const Orders = () => {
       <div className="text-2xl">
         <Title text1={"MY"} text2={"ORDERS"} />
       </div>
-
+      {cartData.length === 0 ? (
+        <div className="text-center my-16 text-gray-600">
+          <img
+            src={assets.empty_cart || "https://cdn-icons-png.flaticon.com/512/2038/2038854.png"}
+            alt="No Orders"
+            className="w-28 mx-auto mb-6 opacity-70"
+          />
+          <p className="text-lg mb-4">You haven't placed any orders yet.</p>
+          <a
+            href="/collection"
+            className="text-blue-600 hover:underline font-semibold"
+          >
+            Start Shopping
+          </a>
+        </div>
+      ) : (
       <div>
         {cartData.map((item, index) => {
           const product = products.find((p) => p.id === Number(item._id));
@@ -93,6 +108,7 @@ const Orders = () => {
           );
         })}
       </div>
+      )}
     </div>
   );
 };

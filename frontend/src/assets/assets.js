@@ -81,6 +81,7 @@ import gpay_icon from './gpay_icon.png'
 import phonepe_icon from './phonepe_icon.png'
 import round from './round.png'
 import profile from './profile.png'
+import empty_cart from './empty_cart.png'
 
 export const assets = {
     logo,
@@ -108,7 +109,8 @@ export const assets = {
     phonepe_icon,
     gpay_icon,
     round,
-    profile
+    profile,
+    empty_cart
 }
 
 export const products = [

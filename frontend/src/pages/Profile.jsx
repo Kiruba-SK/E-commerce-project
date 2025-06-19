@@ -8,6 +8,7 @@ const Profile = () => {
   const [editing, setEditing] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isImageRemoved, setIsImageRemoved] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -54,7 +55,14 @@ const Profile = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
+      setIsImageRemoved(false);
     }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    setIsImageRemoved(true);
   };
 
   const handleChange = (e) => {
@@ -62,14 +70,27 @@ const Profile = () => {
   };
 
   const saveProfile = async () => {
+    const { name, phone, dob, gender } = formData;
+
+    // Check for empty fields
+    if (!name || !phone || !dob || !gender) {
+      toast.error("Please fill out the all field.");
+      return;
+    }
+
     const form = new FormData();
     form.append("email", email);
     form.append("name", formData.name);
     form.append("phone", formData.phone);
     form.append("dob", formData.dob);
     form.append("gender", formData.gender);
-    if (selectedImage) {
+
+    if (selectedImage && !isImageRemoved) {
       form.append("profile_picture", selectedImage);
+    }
+
+    if (isImageRemoved) {
+      form.append("remove_profile_picture", "true");
     }
 
     try {
@@ -80,8 +101,18 @@ const Profile = () => {
       const data = await res.json();
       toast.success(data.message || "Updated!");
       setEditing(false);
+      setImagePreview(null);
+      setSelectedImage(null);
+      setIsImageRemoved(false);
+      // Refresh profile to get updated image
+      const updatedProfile = await fetch(
+        `http://127.0.0.1:8000/get_user_profile/?email=${email}`
+      );
+      const updatedData = await updatedProfile.json();
+      setUser(updatedData);
     } catch (err) {
       console.error("Update failed", err);
+      toast.error("Profile update failed. Please try again.");
     }
   };
 
@@ -92,18 +123,13 @@ const Profile = () => {
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-sm "
         >
-          <img
-            src={assets.cross_icon}
-            className="h-3 w-3 "
-            alt=""
-          />
-         
+          <img src={assets.cross_icon} className="h-3 w-3 " alt="" />
         </button>
       </div>
       <div className="bg-white shadow-md rounded-xl p-6 w-full max-w-md">
         <div className="text-center mb-6">
           {editing ? (
-            <div className="inline-block relative">
+            <div className="inline-block relative group">
               {/* Label wraps image and hidden input together */}
               <label
                 htmlFor="profileImageInput"
@@ -113,6 +139,8 @@ const Profile = () => {
                   src={
                     imagePreview
                       ? imagePreview
+                      : isImageRemoved
+                      ? assets.profile
                       : user?.profile_picture
                       ? `http://127.0.0.1:8000${user.profile_picture}`
                       : assets.profile
@@ -126,17 +154,35 @@ const Profile = () => {
                   accept="image/*"
                   onChange={handleImageChange}
                   className="hidden"
-                  style={{ display: "none" }} // <-- Use inline style for safety
+                  style={{ display: "none" }}
                 />
               </label>
+
+              {/* Cross icon appears on hover */}
+              {(imagePreview ||
+                selectedImage ||
+                (!isImageRemoved && user?.profile_picture)) && (
+                <button
+                  onClick={handleRemoveImage}
+                  className="absolute top-0 right-0 bg-gray-300 hover:bg-gray-300 text-black rounded w-full h-6  text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  // title="Remove image"
+                >
+                  <img
+                    src={assets.cross_icon}
+                    alt="Remove"
+                    className="w-3 h-2 pr-1"
+                  />
+                  Remove image
+                </button>
+              )}
             </div>
           ) : (
             <img
               src={
-                imagePreview
-                  ? imagePreview
-                  : user?.profile_picture
-                  ? `http://127.0.0.1:8000${user.profile_picture}`
+                user?.profile_picture
+                  ? `http://127.0.0.1:8000${
+                      user.profile_picture
+                    }?t=${new Date().getTime()}`
                   : assets.profile
               }
               className="w-24 h-24 mx-auto rounded-full object-cover"
@@ -144,9 +190,7 @@ const Profile = () => {
             />
           )}
 
-          <h2 className="text-2xl font-serif mt-3">
-            {formData.name || "Loading..."}
-          </h2>
+          <h2 className="text-2xl font-serif mt-3">{formData.name || " "}</h2>
         </div>
 
         {editing ? (
@@ -154,17 +198,21 @@ const Profile = () => {
             <div className="w-[90%] mx-5">
               <input
                 name="name"
+                type="text"
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full border p-2 mb-3"
                 placeholder="Name"
+                required
               />
               <input
                 name="phone"
+                type="text"
                 value={formData.phone}
                 onChange={handleChange}
                 className="w-full border p-2 mb-3"
                 placeholder="Phone"
+                required
               />
               <input
                 name="dob"
@@ -172,12 +220,14 @@ const Profile = () => {
                 value={formData.dob}
                 onChange={handleChange}
                 className="w-full border p-2 mb-3"
+                required
               />
               <select
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
                 className="w-full border p-2 mb-3"
+                required
               >
                 <option value="">Select Gender</option>
                 <option value="Male">Male</option>

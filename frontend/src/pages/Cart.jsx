@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Title from "../components/Title";
 import { assets } from "../assets/assets";
 import CartTotal from "../components/CartTotal";
+import { Link } from "react-router-dom";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -28,11 +29,11 @@ const Cart = () => {
       }
 
       setCartData(tempData);
+      window.dispatchEvent(new Event("cart-updated"));
     };
 
     loadCart();
 
-    // Optional: Listen for changes (e.g., from other tabs or `dispatchEvent`)
     window.addEventListener("storage", loadCart);
 
     return () => window.removeEventListener("storage", loadCart);
@@ -66,6 +67,11 @@ const Cart = () => {
     }
     localStorage.setItem("cart", JSON.stringify(cart));
 
+    const email = localStorage.getItem("email");
+    if (email) {
+      localStorage.setItem(`cart_${email}`, JSON.stringify(cart));
+    }
+
     // Notify others that the cart has been updated
     window.dispatchEvent(new Event("cart-updated"));
 
@@ -89,6 +95,24 @@ const Cart = () => {
         <Title text1={"YOUR"} text2={"CART"} />
       </div>
 
+      
+      {cartData.length === 0 ? (
+        <div className="text-center my-16 text-gray-600">
+          <img
+            src={assets.empty_cart || "https://cdn-icons-png.flaticon.com/512/2038/2038854.png"}
+            alt="Empty Cart"
+            className="w-28 mx-auto mb-6 opacity-70"
+          />
+          <p className="text-lg mb-4">Your cart is empty</p>
+          <Link
+            to="/collection"
+            className="text-blue-600 hover:underline font-semibold"
+          >
+            Continue Shopping
+          </Link>
+        </div>
+      ) : (
+        <>
       <div>
         {cartData.map((item, index) => {
           const product = products.find((p) => p.id === Number(item._id));
@@ -100,24 +124,29 @@ const Cart = () => {
               className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
             >
               <div className="flex items-start gap-6">
-                <img
-                  className="w-16 sm:w-20"
-                  src={product.images?.[0]?.image || assets.default_image}
-                  alt={product.name}
-                />
-                <div>
-                  <p className="text-xs sm:text-lg font-medium">
-                    {product.name}
-                  </p>
-                  <div className="flex items-center gap-5 mt-2">
-                    <p>
-                      {currency} {product.price}
+                <Link
+                  to={`/product/${product.id}`}
+                  className="flex items-start gap-6"
+                >
+                  <img
+                    className="w-16 sm:w-20"
+                    src={product.images?.[0]?.image || assets.default_image}
+                    alt={product.name}
+                  />
+                  <div>
+                    <p className="text-xs sm:text-lg font-medium">
+                      {product.name}
                     </p>
-                    <p className="px-2 sm:px-3 sm:py-1 border bg-slate-50">
-                      {item.size}
-                    </p>
+                    <div className="flex items-center gap-5 mt-2">
+                      <p>
+                        {currency} {product.price}
+                      </p>
+                      <p className="px-2 sm:px-3 sm:py-1 border bg-slate-50">
+                        {item.size}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </Link>
               </div>
               <input
                 type="number"
@@ -153,6 +182,8 @@ const Cart = () => {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };
