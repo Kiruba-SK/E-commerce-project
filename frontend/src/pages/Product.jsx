@@ -24,8 +24,9 @@ const Product = () => {
         if (data && data.product) {
           setProductData({
             ...data.product,
-            sizes: JSON.parse(data.product.sizes),
+            sizes: data.product.sizes,
           });
+          console.log("Fetched product:", data);
           setImage(data.product.images[0]?.image || "");
           window.scrollTo({ top: 0, behavior: "smooth" });
         } else {
