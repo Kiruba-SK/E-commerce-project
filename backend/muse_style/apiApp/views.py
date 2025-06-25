@@ -143,7 +143,6 @@ def get_related_products(request):
 
 
 @api_view(['POST'])
-@parser_classes([MultiPartParser, FormParser])
 def add_product(request):
     try:
         new_product = products.objects.create(
