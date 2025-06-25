@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Title from "./Title";
 import ProductItem from "./ProductItem";
+import AxiosInstance from "../components/AxiosInstance";
 
 const LatestCollection = () => {
   const [latestProducts, setLatestProducts] = useState([]);
@@ -8,8 +9,8 @@ const LatestCollection = () => {
   useEffect(() => {
     const fetchLatestProducts = async () => {
       try {
-        const res = await fetch("http://localhost:8000/get_all_products/");
-        const data = await res.json();
+        const res = await AxiosInstance.get("/get_all_products/");
+        const data = await res.data;
 
         // Get latest 10 products (assuming newest are at the end of array)
         const latest = data.products.slice(-10).reverse(); // Most recent first

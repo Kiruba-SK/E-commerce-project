@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Title from "./Title";
 import ProductItem from "./ProductItem";
+import AxiosInstance from "./AxiosInstance";
 
 const BestSeller = () => {
   const [bestSeller, setBestSeller] = useState([]);
@@ -8,8 +9,8 @@ const BestSeller = () => {
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
-        const res = await fetch("http://localhost:8000/get_all_products/");
-        const data = await res.json();
+        const res = await AxiosInstance.get("/get_all_products/");
+        const data = await res.data;
         const bestProduct = data.products.filter((item) => item.bestseller);
         setBestSeller(bestProduct.slice(0, 5));
       } catch (error) {

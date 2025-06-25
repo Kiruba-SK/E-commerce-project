@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { assets } from "../assets/assets";
 import RelatedProduct from "../components/RelatedProduct";
 import { toast } from "react-toastify";
+import AxiosInstance from "../components/AxiosInstance";
+
 
 const Product = () => {
   const { id } = useParams();
@@ -14,10 +16,10 @@ const Product = () => {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/get_product/${id}/`
+        const response = await AxiosInstance.get(
+          `/get_product/${id}/`
         );
-        const data = await response.json();
+        const data = await response.data;
 
         if (data && data.product) {
           setProductData({

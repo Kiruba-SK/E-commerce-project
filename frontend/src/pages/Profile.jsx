@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import AxiosInstance, { BASE_URL } from "../components/AxiosInstance";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -27,10 +28,10 @@ const Profile = () => {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch(
-          `http://127.0.0.1:8000/get_user_profile/?email=${email}`
+        const res = await AxiosInstance.get(
+          `/get_user_profile/?email=${email}`
         );
-        const data = await res.json();
+        const data = await res.data;
         setUser(data);
         setFormData({
           name: data.name || "",
@@ -94,21 +95,22 @@ const Profile = () => {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/update_user_profile/", {
-        method: "POST",
-        body: form,
+      const res = await AxiosInstance.post("/update_user_profile/", form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-      const data = await res.json();
+      const data = res.data;
       toast.success(data.message || "Updated!");
       setEditing(false);
       setImagePreview(null);
       setSelectedImage(null);
       setIsImageRemoved(false);
       // Refresh profile to get updated image
-      const updatedProfile = await fetch(
-        `http://127.0.0.1:8000/get_user_profile/?email=${email}`
+      const updatedProfile = await AxiosInstance.get(
+        `/get_user_profile/?email=${email}`
       );
-      const updatedData = await updatedProfile.json();
+      const updatedData = updatedProfile.data;
       setUser(updatedData);
     } catch (err) {
       console.error("Update failed", err);
@@ -142,7 +144,7 @@ const Profile = () => {
                       : isImageRemoved
                       ? assets.profile
                       : user?.profile_picture
-                      ? `http://127.0.0.1:8000${user.profile_picture}`
+                      ? `${BASE_URL}${user.profile_picture}`
                       : assets.profile
                   }
                   className="w-24 h-24 mx-auto rounded-full object-cover"
@@ -180,7 +182,7 @@ const Profile = () => {
             <img
               src={
                 user?.profile_picture
-                  ? `http://127.0.0.1:8000${
+                  ? `${BASE_URL}${
                       user.profile_picture
                     }?t=${new Date().getTime()}`
                   : assets.profile

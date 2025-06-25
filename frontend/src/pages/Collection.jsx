@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Title from "../components/Title";
 import ProductItem from "../components/ProductItem";
+import AxiosInstance from "../components/AxiosInstance";
 
 const Collection = ({ search }) => {
   const [products, setProducts] = useState([]);
@@ -13,8 +14,8 @@ const Collection = ({ search }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:8000/get_all_products/");
-        const data = await res.json();
+        const res = await AxiosInstance.get("/get_all_products/");
+        const data = await res.data;
         setProducts(data.products);
         setFilterProducts(data.products);
       } catch (error) {

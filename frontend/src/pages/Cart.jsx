@@ -4,6 +4,7 @@ import Title from "../components/Title";
 import { assets } from "../assets/assets";
 import CartTotal from "../components/CartTotal";
 import { Link } from "react-router-dom";
+import AxiosInstance from "../components/AxiosInstance";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -43,8 +44,8 @@ const Cart = () => {
     // 2. Fetch product data
     const fetchProducts = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/get_all_products/`);
-        const data = await res.json();
+        const res = await AxiosInstance.get(`/get_all_products/`);
+        const data = await res.data;
         setProducts(data.products || []);
       } catch (err) {
         console.error("Error loading products", err);

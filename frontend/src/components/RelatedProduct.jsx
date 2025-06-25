@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Title from "./Title";
 import ProductItem from "./ProductItem";
+import AxiosInstance from "../components/AxiosInstance";
 
 const RelatedProduct = ({ category, subCategory }) => {
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -8,10 +9,10 @@ const RelatedProduct = ({ category, subCategory }) => {
   useEffect(() => {
     const fetchRelatedProducts = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/get_related_products/?category=${category}&sub_category=${subCategory}`
+        const response = await AxiosInstance.get(
+          `/get_related_products/?category=${category}&sub_category=${subCategory}`
         );
-        const data = await response.json();
+        const data = await response.data;
 
         // Format each product to pick the first image
         const formattedData = data.map((product) => ({

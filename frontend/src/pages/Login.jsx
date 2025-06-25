@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import AxiosInstance from "../components/AxiosInstance";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Login");
@@ -12,10 +13,7 @@ const Login = () => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
-    const endpoint =
-      currentState === "Login"
-        ? "http://127.0.0.1:8000/login/"
-        : "http://127.0.0.1:8000/create_user/";
+    const endpoint = currentState === "Login" ? "/login/" : "/create_user/";
 
     const payload =
       currentState === "Login"
@@ -23,17 +21,10 @@ const Login = () => {
         : { name, email, password };
 
     try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await AxiosInstance.post(endpoint, payload);
+      const data = response.data;
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (data.success) {
         toast.success(data.message || "Success!");
         const normalizedEmail = email.toLowerCase().trim();
         localStorage.setItem("email", normalizedEmail);
