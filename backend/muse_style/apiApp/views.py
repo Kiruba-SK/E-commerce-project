@@ -150,16 +150,13 @@ def add_product(request):
             name=request.data.get('name'),
             description=request.data.get('description'),
             price=request.data.get('price'),
+            images=request.FILES.get('images'),
             category=request.data.get('category'),
             sub_category=request.data.get('sub_category'),
             sizes=request.data.get('sizes'),
             date=request.data.get('date'),
             bestseller=request.data.get('bestseller') == 'True'
         )
-
-        images = request.FILES.getlist('images')
-        for img in images:
-            productImage.objects.create(product=new_product, image=img)
 
         # Serialize and return newly added product
         serializer = ProductSerializer(new_product, context={'request': request})
