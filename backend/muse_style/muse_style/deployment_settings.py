@@ -21,9 +21,9 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-# CORS_ORIGIN_WHITELIST = (
-#                          'http://localhost:3000',
-#                         )
+CORS_ORIGIN_WHITELIST = (
+                         https://e-commerce-frontend-dd1x.onrender.com,
+                        )
 
 STORAGES = {
     "default":{
