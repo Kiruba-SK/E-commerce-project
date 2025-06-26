@@ -144,7 +144,7 @@ const Profile = () => {
                       : isImageRemoved
                       ? assets.profile
                       : user?.profile_picture
-                      ? `${BASE_URL}${user.profile_picture}`
+                      ? `${BASE_URL}${user.profile_picture}?t=${new Date().getTime()}`
                       : assets.profile
                   }
                   className="w-24 h-24 mx-auto rounded-full object-cover"
