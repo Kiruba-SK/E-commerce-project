@@ -28,6 +28,9 @@ class products(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['id']
+
 
 class productImage(models.Model):
     products = models.ForeignKey(products, related_name='images', on_delete=models.CASCADE)

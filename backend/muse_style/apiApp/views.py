@@ -12,7 +12,7 @@ from apiApp.models import products, productImage
 # Create your views here.
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = products.objects.all()
+    queryset = products.objects.all().order_by('id')
     serializer_class = ProductSerializer
 
 class ProductImageViewSet(viewsets.ModelViewSet):
