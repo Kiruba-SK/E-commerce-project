@@ -118,6 +118,17 @@ const Profile = () => {
     }
   };
 
+  const getProfileImage = () => {
+    if (imagePreview) return imagePreview;
+    if (isImageRemoved) return assets.profile;
+    if (user?.profile_picture) {
+      return user.profile_picture.startsWith("http")
+        ? `${user.profile_picture}?t=${new Date().getTime()}`
+        : `${BASE_URL}${user.profile_picture}?t=${new Date().getTime()}`;
+    }
+    return assets.profile;
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-white/30 via-gray-400 to-white/30">
       <div className="absolute top-5 right-10">
@@ -138,15 +149,7 @@ const Profile = () => {
                 className="cursor-pointer block"
               >
                 <img
-                  src={
-                    imagePreview
-                      ? imagePreview
-                      : isImageRemoved
-                      ? assets.profile
-                      : user?.profile_picture
-                      ? `${BASE_URL}${user.profile_picture}?t=${new Date().getTime()}`
-                      : assets.profile
-                  }
+                  src={getProfileImage()}
                   className="w-24 h-24 mx-auto rounded-full object-cover"
                   alt="Profile"
                 />
@@ -180,13 +183,7 @@ const Profile = () => {
             </div>
           ) : (
             <img
-              src={
-                user?.profile_picture
-                  ? `${BASE_URL}${
-                      user.profile_picture
-                    }?t=${new Date().getTime()}`
-                  : assets.profile
-              }
+              src={getProfileImage()}
               className="w-24 h-24 mx-auto rounded-full object-cover"
               alt="Profile"
             />
