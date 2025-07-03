@@ -38,7 +38,7 @@ def login(request, format=None):
         return Response({
                         "success": True,
                         "message": "Login successful"
-                        })
+                        }, status=201)
     else:
         return Response({
                         "success": False,
@@ -55,16 +55,16 @@ def create_user(request, format=None):
         password = request.data.get('password')
 
         if user_cred.objects.filter(email=email).exists():
-            return Response({'error': 'User already exists'}, status.HTTP_409_BAD_REQUEST)
+            return Response({'error': 'User already exists'}, status=409)
 
         enc_pass = make_password(password)
         obj = user_cred(name=name, email=email, password=enc_pass)
         obj.save()
 
-        return Response({'message': 'User created'}, status.HTTP_201_CREATED)
+        return Response({'message': 'User created'}, status=201)
 
     except Exception as e:
-        return Response({'error': str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': str(e)}, status=500)
 
 @api_view(['POST'])
 def reset_password(request):
