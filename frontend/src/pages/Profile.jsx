@@ -106,6 +106,7 @@ const Profile = () => {
       setImagePreview(null);
       setSelectedImage(null);
       setIsImageRemoved(false);
+      
       // Refresh profile to get updated image
       const updatedProfile = await AxiosInstance.get(
         `/get_user_profile/?email=${email}`

@@ -44,11 +44,18 @@ const Login = () => {
           email,
           new_password: newPassword,
         });
-        toast.success("Password reset successful!");
-        setForgotPassword(false);
-        setNewPassword("");
-        setEmail("");
-        setCurrentState("Login");
+
+        if (response.status === 200) {
+          toast.success("Password reset successful!");
+          setForgotPassword(false);
+          setNewPassword("");
+          setEmail("");
+          setCurrentState("Login");
+          navigate("/login");
+        } else {
+          toast.error(response.data?.error || "Password reset failed.");
+        }
+        setLoading(false);
         return;
       }
 
@@ -62,7 +69,7 @@ const Login = () => {
       response = await AxiosInstance.post(endpoint, payload);
       const data = response.data;
 
-      if (data.success) {
+      if (response.status === 200 || response.status === 201 || data.success) {
         toast.success(data.message || "Success!");
         const normalizedEmail = email.toLowerCase().trim();
         localStorage.setItem("email", normalizedEmail);
@@ -79,14 +86,28 @@ const Login = () => {
           window.dispatchEvent(new Event("cart-restored"));
         }
 
-        navigate("/home");
+        navigate("/");
       } else {
-        toast.info(data.error || data.message || "Failed.");
+        toast.error(data.error || "Failed.");
       }
     } catch (err) {
       console.error("API Error:", err);
-      toast.error("Something went wrong");
+      const status = err.response?.status;
+      const data = err.response?.data;
+
+      if (status === 400) {
+        toast.error(data?.error || "Invalid input.");
+      } else if (status === 401) {
+        toast.error(data?.error || "Invalid credentials.");
+      } else if (status === 409) {
+        toast.error(data?.error || "User already exists.");
+      } else if (status === 404) {
+        toast.error(data?.error || "User not found.");
+      } else {
+        toast.error("Something went wrong. Please try again later.");
+      }
     }
+    setLoading(false);
   };
 
   return (

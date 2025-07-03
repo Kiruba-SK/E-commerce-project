@@ -21,7 +21,7 @@ const App = () => {
   const [showSearch, setShowSearch] = useState(false);
   const location = useLocation();
 
-  const layoutHiddenRoutes = ["/", "/profile"];
+  const layoutHiddenRoutes = ["/login", "/profile"];
   const hideLayout = layoutHiddenRoutes.includes(location.pathname);
 
   return (
@@ -48,8 +48,8 @@ const App = () => {
         />
       )}
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/collection" element={<Collection search={search} />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />

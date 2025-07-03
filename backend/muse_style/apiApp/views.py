@@ -55,7 +55,7 @@ def create_user(request, format=None):
         password = request.data.get('password')
 
         if user_cred.objects.filter(email=email).exists():
-            return Response({'error': 'Username already exists'}, status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'User already exists'}, status.HTTP_409_BAD_REQUEST)
 
         enc_pass = make_password(password)
         obj = user_cred(name=name, email=email, password=enc_pass)
@@ -75,7 +75,7 @@ def reset_password(request):
         company = Company.objects.get(email=email)
         company.password = make_password(new_password)
         company.save()
-        return Response({'message': 'Password reset successful'})
+        return Response({'message': 'Password reset successful'}, status=200)
     except Company.DoesNotExist:
         return Response({'error': 'Email not found'}, status=404)
 

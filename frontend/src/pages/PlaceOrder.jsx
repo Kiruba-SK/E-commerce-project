@@ -35,14 +35,12 @@ const PlaceOrder = () => {
 
     loadCart();
 
-    // Optional: Listen for changes (e.g., from other tabs or `dispatchEvent`)
     window.addEventListener("storage", loadCart);
 
     return () => window.removeEventListener("storage", loadCart);
   }, []);
 
   useEffect(() => {
-    // 2. Fetch product data
     const fetchProducts = async () => {
       try {
         const res = await AxiosInstance.get(`/get_all_products/`);

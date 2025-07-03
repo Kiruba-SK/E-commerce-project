@@ -8,6 +8,8 @@ const Navbar = ({ setShowSearch }) => {
   const [cartCount, setCartCount] = useState(0);
   const navigate = useNavigate();
 
+  const isLoggedIn = !!localStorage.getItem("email");
+
   useEffect(() => {
     const calculateCartCount = () => {
       const cart = JSON.parse(localStorage.getItem("cart")) || {};
@@ -29,8 +31,6 @@ const Navbar = ({ setShowSearch }) => {
 
     window.addEventListener("cart-updated", handleCartUpdate);
     window.addEventListener("storage", handleStorageChange);
-
-    // 👇 NEW: Listen for login cart restoration
     window.addEventListener("cart-restored", handleCartUpdate);
 
     return () => {
@@ -52,18 +52,16 @@ const Navbar = ({ setShowSearch }) => {
     localStorage.removeItem("email"); // clear everything (including cart and email)
 
     window.dispatchEvent(new Event("cart-updated"));
-    // console.log("Saving cart before logout:", email, currentCart);
-    navigate("/");
+    navigate("/login");
   };
-
 
   return (
     <div className="flex items-center justify-between py-5 font-medium">
-      <Link to="/home">
+      <Link to="/">
         <img src={assets.logo} className="w-36" alt="" />
       </Link>
       <ul className="hidden sm:flex gap-5 text-sm text-gray-700">
-        <NavLink to="/home" className="flex flex-col items-center gap-1">
+        <NavLink to="/" className="flex flex-col items-center gap-1">
           <p>HOME</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
@@ -99,24 +97,35 @@ const Navbar = ({ setShowSearch }) => {
           </Link>
           <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
             <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
-              <p
-                className="cursor-pointer hover:text-black"
-                onClick={() => navigate("/profile")}
-              >
-                My Profile
-              </p>
-              <p
-                className="cursor-pointer hover:text-black"
-                onClick={() => navigate("/orders")}
-              >
-                Orders
-              </p>
-              <p
-                className="cursor-pointer hover:text-black"
-                onClick={handleLogout}
-              >
-                Log-out
-              </p>
+              {isLoggedIn ? (
+                <>
+                  <p
+                    className="cursor-pointer hover:text-black"
+                    onClick={() => navigate("/profile")}
+                  >
+                    My Profile
+                  </p>
+                  <p
+                    className="cursor-pointer hover:text-black"
+                    onClick={() => navigate("/orders")}
+                  >
+                    Orders
+                  </p>
+                  <p
+                    className="cursor-pointer hover:text-black"
+                    onClick={handleLogout}
+                  >
+                    Log-out
+                  </p>
+                </>
+              ) : (
+                <p
+                  className="cursor-pointer hover:text-black"
+                  onClick={() => navigate("/login")}
+                >
+                  Login
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -151,7 +160,7 @@ const Navbar = ({ setShowSearch }) => {
           <NavLink
             onClick={() => setVisible(false)}
             className="py-2 pl-6 border"
-            to="/home"
+            to="/"
           >
             HOME
           </NavLink>
@@ -183,18 +192,3 @@ const Navbar = ({ setShowSearch }) => {
 };
 
 export default Navbar;
-
-// const calculateCartCount = () => {
-//   const cart = JSON.parse(localStorage.getItem("cart")) || {};
-//   let count = 0;
-
-//   for (const productId in cart) {
-//     if (isNaN(Number(productId))) continue;
-
-//     for (const size in cart[productId]) {
-//       count += cart[productId][size];
-//     }
-//   }
-
-//   setCartCount(count);
-// };

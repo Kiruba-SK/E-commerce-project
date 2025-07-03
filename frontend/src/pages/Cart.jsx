@@ -41,7 +41,6 @@ const Cart = () => {
   }, []);
 
   useEffect(() => {
-    // 2. Fetch product data
     const fetchProducts = async () => {
       try {
         const res = await AxiosInstance.get(`/get_all_products/`);
