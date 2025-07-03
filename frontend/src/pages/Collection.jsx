@@ -9,17 +9,21 @@ const Collection = ({ search }) => {
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
   const [sortType, setSortType] = useState("relevant");
+  const [loading, setLoading] = useState(true);
 
   // Fetch all products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
         const res = await AxiosInstance.get("/get_all_products/");
         const data = await res.data;
         setProducts(data.products);
         setFilterProducts(data.products);
       } catch (error) {
         console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -46,10 +50,11 @@ const Collection = ({ search }) => {
     // Apply search
     if (search.trim()) {
       const searchWords = search.toLowerCase().split(" ").filter(Boolean);
-    
+
       filtered = filtered.filter((p) => {
-        const haystack = `${p.name} ${p.category} ${p.sub_category}`.toLowerCase();
-    
+        const haystack =
+          `${p.name} ${p.category} ${p.sub_category}`.toLowerCase();
+
         return searchWords.every((word) => haystack.includes(word));
       });
     }
@@ -129,26 +134,32 @@ const Collection = ({ search }) => {
             <option value="high-low">Sort by: High to Low</option>
           </select>
         </div>
+        {/* Loader or Products */}
+        {loading ? (
+          <div className="text-center py-10 text-gray-500 text-lg">
+            Loading products...
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
+            {filterProducts.map((item) => {
+              const imageUrl =
+                item.images && item.images.length > 0
+                  ? item.images[0].image
+                  : null;
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {filterProducts.map((item) => {
-            const imageUrl =
-              item.images && item.images.length > 0
-                ? item.images[0].image
-                : null; 
-
-            return (
-              <ProductItem
-                key={item.id}
-                id={item.id}
-                name={item.name}
-                price={item.price}
-                image={imageUrl}
-                currency="₹"
-              />
-            );
-          })}
-        </div>
+              return (
+                <ProductItem
+                  key={item.id}
+                  id={item.id}
+                  name={item.name}
+                  price={item.price}
+                  image={imageUrl}
+                  currency="₹"
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
