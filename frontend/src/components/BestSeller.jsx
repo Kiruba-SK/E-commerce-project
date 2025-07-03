@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Title from "./Title";
 import ProductItem from "./ProductItem";
-import AxiosInstance from "./AxiosInstance";
+import AxiosInstance from "../components/AxiosInstance";
 
 const BestSeller = () => {
   const [bestSeller, setBestSeller] = useState([]);
