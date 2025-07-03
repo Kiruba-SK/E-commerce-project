@@ -31,8 +31,8 @@ def login(request, format=None):
     except user_cred.DoesNotExist :
         return Response({
                         "success": False, 
-                        'message': 'user does not exist'
-                        })
+                        'message': 'User does not exist'
+                        }, status=404)
     
     if(check_password(password, user_get.password)):
         return Response({
@@ -78,7 +78,7 @@ def reset_password(request):
         return Response({'message': 'Password reset successful'}, status=200)
     except user_cred.DoesNotExist:
         return Response({'error': 'Email not found'}, status=404)
-        
+
 
 @api_view(['GET'])
 def get_user_profile(request):
