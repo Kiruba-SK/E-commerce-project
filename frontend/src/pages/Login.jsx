@@ -40,21 +40,32 @@ const Login = () => {
       let response;
 
       if (forgotPassword) {
-        response = await AxiosInstance.post("/reset-password/", {
-          email,
-          new_password: newPassword,
-        });
+        try {
+          response = await AxiosInstance.post("/reset-password/", {
+            email,
+            new_password: newPassword,
+          });
+          const data = response.data;
 
-        if (response.status === 200) {
-          toast.success("Password reset successful!");
-          setForgotPassword(false);
-          setNewPassword("");
-          setEmail("");
-          setCurrentState("Login");
-          navigate("/login");
-        } else {
-          toast.error(response.data?.error || "Password reset failed.");
+          if (response.status === 200) {
+            toast.success("Password reset successful!");
+            setForgotPassword(false);
+            setNewPassword("");
+            setEmail("");
+            setCurrentState("Login");
+            navigate("/login");
+          }
+        } catch (err) {
+          const status = err.response?.status;
+          const data = err.response?.data;
+
+          if (status === 404) {
+            toast.error(data?.error || "Email not found.");
+          } else {
+            toast.error("Something went wrong. Please try again later.");
+          }
         }
+
         setLoading(false);
         return;
       }
@@ -69,7 +80,7 @@ const Login = () => {
       response = await AxiosInstance.post(endpoint, payload);
       const data = response.data;
 
-      if (response.status === 200 || response.status === 201 || data.success) {
+      if (data.success) {
         toast.success(data.message || "Success!");
         const normalizedEmail = email.toLowerCase().trim();
         localStorage.setItem("email", normalizedEmail);
@@ -82,7 +93,6 @@ const Login = () => {
           } else {
             localStorage.removeItem("cart");
           }
-
           window.dispatchEvent(new Event("cart-restored"));
         }
 

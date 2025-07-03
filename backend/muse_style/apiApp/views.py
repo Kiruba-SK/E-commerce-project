@@ -72,13 +72,13 @@ def reset_password(request):
     new_password = request.data.get('new_password')
 
     try:
-        company = Company.objects.get(email=email)
-        company.password = make_password(new_password)
-        company.save()
+        user = user_cred.objects.get(email=email)
+        user.password = make_password(new_password)
+        user.save()
         return Response({'message': 'Password reset successful'}, status=200)
-    except Company.DoesNotExist:
+    except user_cred.DoesNotExist:
         return Response({'error': 'Email not found'}, status=404)
-
+        
 
 @api_view(['GET'])
 def get_user_profile(request):
