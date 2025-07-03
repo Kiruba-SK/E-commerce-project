@@ -66,6 +66,19 @@ def create_user(request, format=None):
     except Exception as e:
         return Response({'error': str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['POST'])
+def reset_password(request):
+    email = request.data.get('email')
+    new_password = request.data.get('new_password')
+
+    try:
+        company = Company.objects.get(email=email)
+        company.password = make_password(new_password)
+        company.save()
+        return Response({'message': 'Password reset successful'})
+    except Company.DoesNotExist:
+        return Response({'error': 'Email not found'}, status=404)
+
 
 @api_view(['GET'])
 def get_user_profile(request):
