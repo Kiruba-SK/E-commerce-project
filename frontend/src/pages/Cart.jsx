@@ -5,12 +5,14 @@ import { assets } from "../assets/assets";
 import CartTotal from "../components/CartTotal";
 import { Link } from "react-router-dom";
 import AxiosInstance from "../components/AxiosInstance";
+import Loading from "../components/Loading";
 
 const Cart = () => {
   const navigate = useNavigate();
   const [cartData, setCartData] = useState([]);
   const [products, setProducts] = useState([]);
   const [currency] = useState("₹");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadCart = () => {
@@ -48,6 +50,8 @@ const Cart = () => {
         setProducts(data.products || []);
       } catch (err) {
         console.error("Error loading products", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -71,8 +75,6 @@ const Cart = () => {
     if (email) {
       localStorage.setItem(`cart_${email}`, JSON.stringify(cart));
     }
-
-    // Notify others that the cart has been updated
     window.dispatchEvent(new Event("cart-updated"));
 
     // Refresh state
@@ -94,12 +96,15 @@ const Cart = () => {
       <div className="text-2xl mb-3">
         <Title text1={"YOUR"} text2={"CART"} />
       </div>
-
-      
-      {cartData.length === 0 ? (
+      {loading ? (
+        <Loading/>
+      ) : cartData.length === 0 ? (
         <div className="text-center my-16 text-gray-600">
           <img
-            src={assets.empty_cart || "https://cdn-icons-png.flaticon.com/512/2038/2038854.png"}
+            src={
+              assets.empty_cart ||
+              "https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
+            }
             alt="Empty Cart"
             className="w-28 mx-auto mb-6 opacity-70"
           />
@@ -113,79 +118,129 @@ const Cart = () => {
         </div>
       ) : (
         <>
-      <div>
-        {cartData.map((item, index) => {
-          const product = products.find((p) => p.id === Number(item._id));
-          if (!product) return null;
+          <div>
+            {cartData.map((item, index) => {
+              const product = products.find((p) => p.id === Number(item._id));
+              if (!product) return null;
 
-          return (
-            <div
-              key={index}
-              className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
-            >
-              <div className="flex items-start gap-6">
-                <Link
-                  to={`/product/${product.id}`}
-                  className="flex items-start gap-6"
+              return (
+                <div
+                  key={index}
+                  className="py-4 border-t border-b text-gray-700 flex flex-col sm:grid sm:grid-cols-[4fr_2fr_0.5fr] sm:items-center gap-4"
                 >
-                  <img
-                    className="w-16 sm:w-20"
-                    src={product.images?.[0]?.image || assets.default_image}
-                    alt={product.name}
-                  />
-                  <div>
-                    <p className="text-xs sm:text-lg font-medium">
-                      {product.name}
-                    </p>
-                    <div className="flex items-center gap-5 mt-2">
-                      <p>
-                        {currency} {product.price}
-                      </p>
-                      <p className="px-2 sm:px-3 sm:py-1 border bg-slate-50">
-                        {item.size}
-                      </p>
-                    </div>
+                  <div className="flex items-start gap-4">
+                    <Link to={`/product/${product.id}`} className="flex gap-4">
+                      <img
+                        className="w-20 h-20 object-cover"
+                        src={product.images?.[0]?.image || assets.default_image}
+                        alt={product.name}
+                      />
+                      <div className="flex flex-col justify-between">
+                        <p className="text-base font-medium">{product.name}</p>
+                        <div className="flex items-center gap-3 mt-1 text-sm">
+                          <p>
+                            {currency} {product.price}
+                          </p>
+                          <span className="px-2 py-0.5 border bg-slate-50 rounded">
+                            {item.size}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
                   </div>
-                </Link>
-              </div>
-              <input
-                type="number"
-                min={1}
-                defaultValue={item.quantity}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  if (val >= 1) updateQuantity(item._id, item.size, val);
-                }}
-                className="border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
-              />
-              <img
-                src={assets.bin_icon}
-                alt=""
-                onClick={() => updateQuantity(item._id, item.size, 0)}
-                className="w-4 mr-4 sm:w-5 cursor-pointer"
-              />
-            </div>
-          );
-        })}
-      </div>
 
-      <div className="flex justify-end my-20">
-        <div className="w-full sm:w-[450px]">
-          <CartTotal cartItems={cartData} products={products} />
-          <div className="w-full text-end">
-            <button
-              onClick={() => navigate("/place-order")}
-              className="bg-black text-white text-sm my-8 px-8 py-3"
-            >
-              PROCEED TO CHECKOUT
-            </button>
+                  <div className="flex sm:justify-center items-center gap-2 sm:gap-0">
+                    <input
+                      type="number"
+                      min={1}
+                      defaultValue={item.quantity}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (val >= 1) updateQuantity(item._id, item.size, val);
+                      }}
+                      className="border w-16 sm:w-20 px-2 py-1 text-center"
+                    />
+                  </div>
+
+                  <div className="flex justify-end sm:justify-center items-center">
+                    <img
+                      src={assets.bin_icon}
+                      alt="Remove"
+                      onClick={() => updateQuantity(item._id, item.size, 0)}
+                      className="w-5 cursor-pointer"
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
-      </div>
-      </>
+
+          <div className="flex justify-end my-20">
+            <div className="w-full sm:w-[450px]">
+              <CartTotal cartItems={cartData} products={products} />
+              <div className="w-full text-end">
+                <button
+                  onClick={() => navigate("/place-order")}
+                  className="bg-black text-white text-sm my-8 px-8 py-3"
+                >
+                  PROCEED TO CHECKOUT
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
 };
 
 export default Cart;
+
+// return (
+//             <div
+//               key={index}
+//               className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
+//             >
+//               <div className="flex items-start gap-6">
+//                 <Link
+//                   to={`/product/${product.id}`}
+//                   className="flex items-start gap-6"
+//                 >
+//                   <img
+//                     className="w-16 sm:w-20"
+//                     src={product.images?.[0]?.image || assets.default_image}
+//                     alt={product.name}
+//                   />
+//                   <div>
+//                     <p className="text-xs sm:text-lg font-medium">
+//                       {product.name}
+//                     </p>
+//                     <div className="flex items-center gap-5 mt-2">
+//                       <p>
+//                         {currency} {product.price}
+//                       </p>
+//                       <p className="px-2 sm:px-3 sm:py-1 border bg-slate-50">
+//                         {item.size}
+//                       </p>
+//                     </div>
+//                   </div>
+//                 </Link>
+//               </div>
+//               <input
+//                 type="number"
+//                 min={1}
+//                 defaultValue={item.quantity}
+//                 onChange={(e) => {
+//                   const val = Number(e.target.value);
+//                   if (val >= 1) updateQuantity(item._id, item.size, val);
+//                 }}
+//                 className="border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
+//               />
+//               <img
+//                 src={assets.bin_icon}
+//                 alt=""
+//                 onClick={() => updateQuantity(item._id, item.size, 0)}
+//                 className="w-4 mr-4 sm:w-5 cursor-pointer"
+//               />
+//             </div>
+//           );

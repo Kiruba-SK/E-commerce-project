@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import Title from "../components/Title";
 import { assets } from "../assets/assets";
 import AxiosInstance from "../components/AxiosInstance";
-
+import Loading from "../components/Loading";
 
 const Orders = () => {
   const [cartData, setCartData] = useState([]);
   const [products, setProducts] = useState([]);
   const [currency] = useState("₹");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadCart = () => {
@@ -40,6 +41,8 @@ const Orders = () => {
         setProducts(data.products || []);
       } catch (err) {
         console.error("Error loading products", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -51,10 +54,15 @@ const Orders = () => {
       <div className="text-2xl">
         <Title text1={"MY"} text2={"ORDERS"} />
       </div>
-      {cartData.length === 0 ? (
+      {loading ? (
+        <Loading />
+      ) : cartData.length === 0 ? (
         <div className="text-center my-16 text-gray-600">
           <img
-            src={assets.empty_cart || "https://cdn-icons-png.flaticon.com/512/2038/2038854.png"}
+            src={
+              assets.empty_cart ||
+              "https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
+            }
             alt="No Orders"
             className="w-28 mx-auto mb-6 opacity-70"
           />
@@ -67,49 +75,49 @@ const Orders = () => {
           </a>
         </div>
       ) : (
-      <div>
-        {cartData.map((item, index) => {
-          const product = products.find((p) => p.id === Number(item._id));
-          if (!product) return null;
+        <div>
+          {cartData.map((item, index) => {
+            const product = products.find((p) => p.id === Number(item._id));
+            if (!product) return null;
 
-          return (
-            <div
-              key={index}
-              className="py-4 border-t border-b text-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-            >
-              <div className="flex items-start gap-6 text-sm">
-                <img
-                  className="w-16 sm:w-20"
-                  src={product.images?.[0]?.image || assets.default_image}
-                  alt={product.name}
-                />
-                <div>
-                  <p className="sm:text-base font-medium">{product.name}</p>
-                  <div className="flex items-center mt-2 gap-3 text-base text-gray-700">
-                    <p className="text-lg">
-                      {currency} {product.price}
+            return (
+              <div
+                key={index}
+                className="py-4 border-t border-b text-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+              >
+                <div className="flex items-start gap-6 text-sm">
+                  <img
+                    className="w-16 sm:w-20"
+                    src={product.images?.[0]?.image || assets.default_image}
+                    alt={product.name}
+                  />
+                  <div>
+                    <p className="sm:text-base font-medium">{product.name}</p>
+                    <div className="flex items-center mt-2 gap-3 text-base text-gray-700">
+                      <p className="text-lg">
+                        {currency} {product.price}
+                      </p>
+                      <p>Quantity: {item.quantity}</p>
+                      <p>Size: {item.size}</p>
+                    </div>
+                    <p className="mt-2">
+                      Date: <span className="text-gray-400">25 Jan 2025</span>
                     </p>
-                    <p>Quantity: {item.quantity}</p>
-                    <p>Size: {item.size}</p>
                   </div>
-                  <p className="mt-2">
-                    Date: <span className="text-gray-400">25 Jan 2025</span>
-                  </p>
+                </div>
+                <div className="md:w-1/2 flex justify-between mr-5">
+                  <div className="flex items-center gap-2">
+                    <p className="min-w-2 h-2 rounded-full bg-green-500"></p>
+                    <p className="text-sm md:text-base">Ready to Ship</p>
+                  </div>
+                  <button className="border px-2 py-2 text-sm font-medium rounded-sm hover:bg-black hover:text-white transition-all duration-500">
+                    Track Order
+                  </button>
                 </div>
               </div>
-              <div className="md:w-1/2 flex justify-between mr-5">
-                <div className="flex items-center gap-2">
-                  <p className="min-w-2 h-2 rounded-full bg-green-500"></p>
-                  <p className="text-sm md:text-base">Ready to Ship</p>
-                </div>
-                <button className="border px-2 py-2 text-sm font-medium rounded-sm hover:bg-black hover:text-white transition-all duration-500">
-                  Track Order
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );

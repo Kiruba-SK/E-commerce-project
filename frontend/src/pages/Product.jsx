@@ -5,7 +5,6 @@ import RelatedProduct from "../components/RelatedProduct";
 import { toast } from "react-toastify";
 import AxiosInstance from "../components/AxiosInstance";
 
-
 const Product = () => {
   const { id } = useParams();
   const [productData, setProductData] = useState(null);
@@ -16,9 +15,7 @@ const Product = () => {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await AxiosInstance.get(
-          `/get_product/${id}/`
-        );
+        const response = await AxiosInstance.get(`/get_product/${id}/`);
         const data = await response.data;
 
         if (data && data.product) {
@@ -41,6 +38,13 @@ const Product = () => {
   }, [id]);
 
   const handleAddToCart = () => {
+    const email = localStorage.getItem("email");
+
+    if (!email) {
+      toast.info("Please login first.");
+      return;
+    }
+
     if (!size) {
       toast.error("Please select a size before adding to cart.");
       return;
@@ -59,15 +63,9 @@ const Product = () => {
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem(`cart_${email}`, JSON.stringify(cart));
 
-    const email = localStorage.getItem("email");
-    if (email) {
-      localStorage.setItem(`cart_${email}`, JSON.stringify(cart));
-    }
-
-    // Dispatch event to notify Navbar
     window.dispatchEvent(new Event("cart-updated"));
-
     toast.success("Product added to cart!");
   };
 

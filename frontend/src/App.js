@@ -37,6 +37,8 @@ const App = () => {
         draggable
         pauseOnHover
         theme="light"
+        toastClassName="toast-container-custom"
+        bodyClassName="toast-body-custom"
       />
       {!hideLayout && <Navbar setShowSearch={setShowSearch} />}
       {!hideLayout && (

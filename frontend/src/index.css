@@ -34,3 +34,30 @@ a.active hr {
     color: white;
   }
 }
+
+/* Toast container positioning */
+.toast-container-custom {
+  width: auto;
+  max-width: 90vw;
+  font-size: 14px;
+}
+
+/* Toast body content */
+.toast-body-custom {
+  word-break: break-word;
+}
+
+/* Optional: responsive tweaks for small screens */
+@media (max-width: 640px) {
+  .toast-container-custom {
+    top: 1rem !important;
+    right: 1rem !important;
+    left: 1rem !important;
+    max-width: 90vw !important;
+    font-size: 12px !important;
+  }
+
+  .toast-body-custom {
+    padding: 8px 10px !important;
+  }
+}

@@ -45,11 +45,11 @@ const Navbar = ({ setShowSearch }) => {
     const currentCart = localStorage.getItem("cart");
 
     if (email && currentCart) {
-      localStorage.setItem(`cart_${email}`, currentCart); // save cart to user-specific key
+      localStorage.setItem(`cart_${email}`, currentCart); 
     }
 
-    localStorage.removeItem("cart"); // ✅ Remove current session cart
-    localStorage.removeItem("email"); // clear everything (including cart and email)
+    localStorage.removeItem("cart"); 
+    localStorage.removeItem("email"); 
 
     window.dispatchEvent(new Event("cart-updated"));
     navigate("/login");
@@ -88,13 +88,11 @@ const Navbar = ({ setShowSearch }) => {
         />
 
         <div className="group relative">
-          <Link to="/profile">
             <img
               src={assets.profile_icon}
               className="w-5 cursor-pointer"
               alt=""
             />
-          </Link>
           <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
             <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
               {isLoggedIn ? (

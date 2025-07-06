@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Title from "../components/Title";
 import ProductItem from "../components/ProductItem";
 import AxiosInstance from "../components/AxiosInstance";
+import Loading from "../components/Loading";
 
 const Collection = ({ search }) => {
   const [products, setProducts] = useState([]);
@@ -136,9 +137,7 @@ const Collection = ({ search }) => {
         </div>
         {/* Loader or Products */}
         {loading ? (
-          <div className="text-center py-10 text-gray-500 text-lg">
-            Loading products...
-          </div>
+          <Loading />
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
             {filterProducts.map((item) => {

@@ -22,7 +22,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (!email) {
-      toast.error("Please Login ");
+      toast.info("Please Login first.");
       return;
     }
 
